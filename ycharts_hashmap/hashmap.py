@@ -36,7 +36,14 @@ class Hashmap:
         :param default: the default value to return if the key is not found
         :returns: the value associated with the key, or the default value
         """
-        pass
+        key_hash = self._hash(key)
+
+        index_key = self._index_of_key(key_hash, key)
+        if index_key != -1:
+            pair = self._array[key_hash][index_key]
+            return pair[1]
+
+        return default
 
     def put(self, key, value):
         """Set the value associated with the key
@@ -47,8 +54,48 @@ class Hashmap:
 
         :param key: the key associated with the value
         :param value: the value associated with the key
+        :raises: TypeError if key is unhashable
         """
-        pass
+        key_hash = self._hash(key)
+
+        index_key = self._index_of_key(key_hash, key)
+        if index_key == -1:
+            if self._array[key_hash]:
+                self._array[key_hash].append([key, value])
+            else:
+                self._array[key_hash] = [[key, value]]
+        else:
+            pair = self._array[key_hash][index_key]
+            pair[1] = value
+
+    def _hash(self, key):
+        """Hash the key taking in account the underlying array size
+
+        Hash the key to a number that can be mapped to an index
+        on the underlaying array.
+
+        :param key: the key to be hashed
+        :returns: the number representing the hash
+        :raises: TypeError if the is unhashable
+        """
+        key_hash = hash(key)
+
+        return key_hash % self.array_size
+
+    def _index_of_key(self, key_hash, key):
+        """Find the index of a key in the underlying array at key_hash
+
+        :param key_hash: the position in the underlying array to search on
+        :param key: the key to be found
+        :returns: the index if the key is found, -1 otherwise
+        """
+        pairs = self._array[key_hash]
+        if pairs:
+            for i, pair in enumerate(pairs):
+                if pair[0] == key:
+                    return i
+
+        return -1
 
     def delete(self, key):
         """Delete the entry associated with the key
@@ -56,4 +103,10 @@ class Hashmap:
         :param key: the key to be deleted
         :raises: KeyError when the key is not found in the Hashmap
         """
-        pass
+        key_hash = self._hash(key)
+
+        index_key = self._index_of_key(key_hash, key)
+        if index_key == -1:
+            raise KeyError(key)
+        else:
+            del self._array[key_hash][index_key]
