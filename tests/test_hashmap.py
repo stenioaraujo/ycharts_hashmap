@@ -90,3 +90,84 @@ def test_delete_key_not_exist():
 
     with pytest.raises(KeyError):
         hashmap.delete(key)
+
+
+def test_pythonic_put_read():
+    hashmap = Hashmap()
+
+    key = (1, "key")
+    value = (1, "value")
+
+    hashmap[key] = value
+
+    assert hashmap[key] == value
+
+
+def test_pythonic_read_nonexistent_key():
+    hashmap = Hashmap()
+
+    key = "I DON'T EXIST"
+
+    with pytest.raises(KeyError):
+        hashmap[key]
+
+
+def test_pythonic_delete():
+    hashmap = Hashmap()
+
+    key = 1
+    value = 2
+
+    hashmap[key] = value
+    assert hashmap[key] == value
+
+    del hashmap[key]
+    with pytest.raises(KeyError):
+        hashmap[key]
+
+
+def test_pythonic_in_hashmap():
+    hashmap = Hashmap()
+
+    key = 1
+    value = 2
+
+    hashmap[key] = value
+    assert key in hashmap
+
+    assert "I DON'T EXIST" not in hashmap
+
+
+def test_pythonic_iterate_over_keys():
+    hashmap = Hashmap()
+
+    keys = [1, 2]
+
+    for i, key in enumerate(keys):
+        hashmap[key] = "A VALUE"
+
+    count_keys = 0
+    for key in hashmap:
+        assert key in keys
+        count_keys += 1
+
+    assert count_keys == len(keys)
+
+
+def test_pythonic_number_keys():
+    hashmap = Hashmap()
+
+    keys = [1, 2, 3]
+
+    assert len(hashmap) == 0
+
+    for i, key in enumerate(keys):
+        hashmap[key] = "A VALUE"
+
+    assert len(hashmap) == len(keys)
+
+    hashmap[keys[0]] = "ANOTHER VALUE"
+    assert len(hashmap) == len(keys)
+
+    del hashmap[keys[0]]
+    assert len(hashmap) == (len(keys) - 1)

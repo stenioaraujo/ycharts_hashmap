@@ -23,6 +23,7 @@ class Hashmap:
         validations.greater_than(array_size, 0)
 
         self._array = [None] * array_size
+        self._num_keys = 0
 
     @property
     def array_size(self):
@@ -36,6 +37,18 @@ class Hashmap:
         :param default: the default value to return if the key is not found
         :returns: the value associated with the key, or the default value
         """
+        try:
+            return self.__getitem__(key)
+        except KeyError:
+            return default
+
+    def __getitem__(self, key):
+        """Return the value associated with the key
+
+        :param key: the key to be used to retrieve the value
+        :returns: the value associated with the key, or the default value
+        :raises: KeyError when the key is not found in the Hashmap
+        """
         key_hash = self._hash(key)
 
         index_key = self._index_of_key(key_hash, key)
@@ -43,7 +56,7 @@ class Hashmap:
             pair = self._array[key_hash][index_key]
             return pair[1]
 
-        return default
+        raise KeyError(key)
 
     def put(self, key, value):
         """Set the value associated with the key
@@ -56,6 +69,9 @@ class Hashmap:
         :param value: the value associated with the key
         :raises: TypeError if key is unhashable
         """
+        self.__setitem__(key, value)
+
+    def __setitem__(self, key, value):
         key_hash = self._hash(key)
 
         index_key = self._index_of_key(key_hash, key)
@@ -64,6 +80,7 @@ class Hashmap:
                 self._array[key_hash].append([key, value])
             else:
                 self._array[key_hash] = [[key, value]]
+            self._num_keys += 1
         else:
             pair = self._array[key_hash][index_key]
             pair[1] = value
@@ -103,6 +120,9 @@ class Hashmap:
         :param key: the key to be deleted
         :raises: KeyError when the key is not found in the Hashmap
         """
+        self.__delitem__(key)
+
+    def __delitem__(self, key):
         key_hash = self._hash(key)
 
         index_key = self._index_of_key(key_hash, key)
@@ -110,3 +130,32 @@ class Hashmap:
             raise KeyError(key)
         else:
             del self._array[key_hash][index_key]
+            self._num_keys -= 1
+
+    def __contains__(self, key):
+        """Verify if key is in the Hashmap
+
+        :param key: the key to be checked
+        :returns: True if the key is in the Hashmap, False otherwise
+        """
+        key_hash = self._hash(key)
+
+        index_key = self._index_of_key(key_hash, key)
+        return index_key != -1
+
+    def __iter__(self):
+        """Iterate over all the keys in the Hashmap
+
+        :returns: A generator for all the keys in the Hashmap
+        """
+        for arr_pos in self._array:
+            if arr_pos:
+                for key, value in arr_pos:
+                    yield key
+
+    def __len__(self):
+        """Return the number of keys in the Hashmap
+
+        :returns: the number of keys in the Hashmap
+        """
+        return self._num_keys
