@@ -9,6 +9,32 @@
 <b>ycharts_hashmap</b> is a module that contains the class Hashmap. The ease of hashmaps.
 </p>
 
+## Overview
+
+- Architectural decisions:
+  - [x] Use list to threat collisions
+    - By using list I can index a specific position and make the code less repetitive. The trade off is, delete operations will take O(n), where n is the number of keys with the same hash.
+  - [x] Use python's hashing function
+  - Define basic methods:
+    - [x] get(key[, default])
+    - [x] put(key, value)
+    - [x] delete(key)
+    - [x] \_\_getitem\_\_(key)
+    - [x] \_\_setitem\_\_(key, value)
+    - [x] \_\_delitem\_\_(key)
+    - [x] \_\_contains\_\_(key)
+    - [x] \_\_iter\_\_()
+    - [x] \_\_len\_\_()
+	- [x] \_\_reversed\_\_()
+		- This was implemented to allow the iterator to be reversed
+  - [x] Initially have a fixed size for the underlying array, the size can be passed as parameter on the constructor
+  - [x] Make it a library that can be imported by other python programs
+  - [x] Use pytest, pytest-cov and tox for testing
+  - [x] Use travis as CI
+  - [x] Make the underlying array grow when the number of keys reach the array\_size * resize\_multiplier
+    - Each key is re-inserted in the Hashmap to allow rehashing.
+    - By resizing and redistributing, we have a chance to lower the number of collisions.
+
 ## Requirements
 
 This library was tested on Ubuntu 18.04, the following was used:
@@ -59,7 +85,7 @@ Other python applications on the system will have access to the `ychart_hashmap`
 
 ## Usage
 
-The `Hashmap` class can be access through the `ycharts_hashmap` library, bellow it is shown how to use the features available.
+The `Hashmap` class can be accessed through the `ycharts_hashmap` library, bellow it is shown how to use the features available.
 
 Those commands can be ran directly on the python interpreter started on the preivous sections.
 
@@ -103,6 +129,10 @@ for key in h:
 # Iterate over the keys in reverse order
 for key in reversed(h):
     print(key)
+
+# Iterate over the keys and values
+for key, value in h.items():
+    print(key, value) # "one 1" and "three 3"
 
 # Get the number of keys in the Hashmap
 print(len(h)) # 2

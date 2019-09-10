@@ -14,16 +14,23 @@ class Hashmap:
     print(hmap.get("bom dia")) # good morning
     """
 
-    def __init__(self, array_size=100):
+    def __init__(self, array_size=100, resize_multiplier=10):
         """Create a Hashmap instance
 
         :param array_size: the underlying array size
-        :raises: InvalidParameter when array_size is not greater than 0
+        :param resize_multiplier: multiply the underlying array by it when
+            the number of keys reach the number of spots in the underlying
+            array
+        :raises: InvalidParameter when:
+            array_size is not greater than 0
+            resize_multiplier is not greater than 1
         """
         validations.greater_than(array_size, 0)
+        validations.greater_than(resize_multiplier, 1)
 
         self._array = [None] * array_size
         self._num_keys = 0
+        self._resize_multiplier = resize_multiplier
 
     @property
     def array_size(self):
@@ -85,17 +92,36 @@ class Hashmap:
             pair = self._array[key_hash][index_key]
             pair[1] = value
 
+        if len(self) > self.array_size * self._resize_multiplier:
+            self._grow_underlying_array()
+
+    def _grow_underlying_array(self):
+        """Create a new underlying array and redistribute keys"""
+        keep_num_keys = self._num_keys
+        old_array = self._array
+        self._array = [None] * self.array_size * self._resize_multiplier
+
+        for key, value in self._items(old_array):
+            self.put(key, value)
+
+        self._num_keys = keep_num_keys
+
     def _hash(self, key):
         """Hash the key taking in account the underlying array size
 
         Hash the key to a number that can be mapped to an index
         on the underlaying array.
 
+        This function hashes the string representation of the hash
+        of the key. This is done to ensure that a hash of an integer
+        is not the integer itself (idealy).
+
         :param key: the key to be hashed
         :returns: the number representing the hash
         :raises: TypeError if the is unhashable
         """
         key_hash = hash(key)
+        key_hash = hash(str(key_hash))
 
         return key_hash % self.array_size
 
@@ -148,10 +174,25 @@ class Hashmap:
 
         :returns: A generator for all the keys in the Hashmap
         """
-        for arr_pos in self._array:
+        for key, _ in self.items():
+            yield key
+
+    def items(self):
+        """Iterate over all the pairs (keys, value) in the Hashmap
+
+        :returns: A generator for all the pairs
+        """
+        return self._items(self._array)
+
+    def _items(self, underlying_array):
+        """Iterate over all the pairs (keys, value) in the underlying_array
+
+        :returns: A generator for all the pairs
+        """
+        for arr_pos in underlying_array:
             if arr_pos:
-                for key, _ in arr_pos:
-                    yield key
+                for key, value in arr_pos:
+                    yield key, value
 
     def __len__(self):
         """Return the number of keys in the Hashmap

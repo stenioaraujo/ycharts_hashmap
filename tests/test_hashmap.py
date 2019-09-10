@@ -185,3 +185,38 @@ def test_pythonic_reverse_iterate_over_keys():
     iterate_reversed = list(reversed(hashmap))
 
     assert iterate_forward[::-1] == iterate_reversed
+
+
+def test_iterate_key_value():
+    hashmap = Hashmap()
+
+    values = [1, "two", 3, 4.0, "Five"]
+
+    for i, value in enumerate(values):
+        key = str(i)
+        hashmap[key] = value
+
+    for key, value in hashmap.items():
+        i = int(key)
+        assert values[i] == value
+
+
+def test_resize_underlying_array():
+    hashmap = Hashmap(10, 10)
+
+    keys = list(range(101))
+    value = "A VALUE"
+
+    for key in keys[:len(keys) - 1]:
+        hashmap[key] = value
+
+    assert hashmap.array_size == 10
+
+    iter_keys_before_resize = list(hashmap)
+    hashmap[keys[-1]] = value
+    iter_keys_after_resize = list(hashmap)
+
+    assert hashmap.array_size == 100
+    assert len(hashmap) == 101
+    assert sorted(hashmap) == keys
+    assert iter_keys_before_resize != iter_keys_after_resize
