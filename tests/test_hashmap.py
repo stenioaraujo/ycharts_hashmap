@@ -171,3 +171,17 @@ def test_pythonic_number_keys():
 
     del hashmap[keys[0]]
     assert len(hashmap) == (len(keys) - 1)
+
+
+def test_pythonic_reverse_iterate_over_keys():
+    hashmap = Hashmap()
+
+    keys = [1, "two", 3, 4.0, "Five"]
+
+    for _, key in enumerate(keys):
+        hashmap[key] = "A VALUE"
+
+    iterate_forward = list(hashmap)
+    iterate_reversed = list(reversed(hashmap))
+
+    assert iterate_forward[::-1] == iterate_reversed

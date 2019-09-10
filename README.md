@@ -100,6 +100,10 @@ print("one" in h) # True
 for key in h:
     print(key) # Will print "one" and "three"
 
+# Iterate over the keys in reverse order
+for key in reversed(h):
+    print(key)
+
 # Get the number of keys in the Hashmap
 print(len(h)) # 2
 ```

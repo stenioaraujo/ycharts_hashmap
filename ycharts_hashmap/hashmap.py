@@ -150,7 +150,7 @@ class Hashmap:
         """
         for arr_pos in self._array:
             if arr_pos:
-                for key, value in arr_pos:
+                for key, _ in arr_pos:
                     yield key
 
     def __len__(self):
@@ -159,3 +159,13 @@ class Hashmap:
         :returns: the number of keys in the Hashmap
         """
         return self._num_keys
+
+    def __reversed__(self):
+        """Iterate in reverse order all the keys in the Hashmap
+
+        :returns: A generator for all the keys in the Hashmap reversed
+        """
+        for arr_pos in reversed(self._array):
+            if arr_pos:
+                for key, _ in reversed(arr_pos):
+                    yield key
